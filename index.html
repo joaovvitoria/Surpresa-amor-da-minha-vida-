@@ -112,14 +112,15 @@
             border-radius: 2px;
         }
 
-        /* Fantasmas em Movimento */
+        /* Fantasminhas */
         .moving-trap {
             position: absolute;
-            width: 20px;
-            height: 20px;
-            background-color: #ff1744;
-            border-radius: 50%;
-            box-shadow: 0 0 15px rgba(255,23,68,0.9);
+            width: 30px;
+            height: 30px;
+            font-size: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             z-index: 5;
         }
 
@@ -129,8 +130,8 @@
             justify-content: center;
             align-items: center;
             background-color: #d81b60;
-            right: 15px;
-            bottom: 15px;
+            right: 20px;
+            bottom: 20px;
             width: 60px;
             height: 60px;
             font-size: 1.8rem;
@@ -169,10 +170,11 @@
         }
 
         .sub-text {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             color: #555;
-            margin-top: 10px;
+            margin-top: 15px;
             font-weight: bold;
+            line-height: 1.6;
         }
 
         @keyframes fadeIn {
@@ -186,41 +188,30 @@
 
     <div id="screen1" class="screen active">
         <h1>Olá, meu amor! ❤️</h1>
-        <p>A tua primeira surpresa foi muito fácil, por isso preparei um desafio maior e mais complexo!</p>
+        <p>Preparei um pequeno desafio para ti...</p>
         <p><strong>Regras do Jogo:</strong> Usa as <strong>SETAS DO TECLADO</strong> para mover o teu quadradinho azul até ao Coração.</p>
-        <p>⚠️ <em>Cuidado com as paredes vermelhas E com os fantasmas em movimento! Se bateres, recomeças!</em></p>
-        <button class="btn" onclick="startGame()">Aceitar o Desafio</button>
+        <p>⚠️ <em>Cuidado para não bateres nas paredes vermelhas nem nos fantasmas!</em></p>
+        <button class="btn" onclick="startGame()">Começar o Jogo</button>
     </div>
 
     <div id="screen2" class="screen">
         <div id="maze-wrapper">
-            <h2>Labirinto do Amor... Nível 2! 😂</h2>
+            <h2>Labirinto do Amor ❤️</h2>
             <p id="status-text">Usa as setas do teclado para te moveres.</p>
             
             <div id="maze-container">
                 <div id="player"></div>
                 
-                <div class="moving-trap" id="trap1" data-direction="right" style="left: 120px; top: 460px;"></div>
-                <div class="moving-trap" id="trap2" data-direction="up" style="left: 470px; top: 380px;"></div>
-                <div class="moving-trap" id="trap3" data-direction="down" style="left: 700px; top: 120px;"></div>
+                <div class="moving-trap" id="trap1" data-direction="down" style="left: 200px; top: 100px;">👻</div>
+                <div class="moving-trap" id="trap2" data-direction="up" style="left: 520px; top: 380px;">👻</div>
                 
-                <div class="wall" style="left: 100px; top: 0px; width: 20px; height: 420px;"></div>
+                <div class="wall" style="left: 120px; top: 0px; width: 20px; height: 400px;"></div>
                 
-                <div class="wall" style="left: 100px; top: 400px; width: 320px; height: 20px;"></div>
+                <div class="wall" style="left: 280px; top: 120px; width: 20px; height: 400px;"></div>
                 
-                <div class="wall" style="left: 400px; top: 120px; width: 20px; height: 300px;"></div>
+                <div class="wall" style="left: 440px; top: 0px; width: 20px; height: 400px;"></div>
                 
-                <div class="wall" style="left: 200px; top: 120px; width: 220px; height: 20px;"></div>
-
-                <div class="wall" style="left: 200px; top: 220px; width: 120px; height: 20px;"></div>
-                <div class="wall" style="left: 200px; top: 220px; width: 20px; height: 100px;"></div>
-                <div class="wall" style="left: 200px; top: 300px; width: 120px; height: 20px;"></div>
-                
-                <div class="wall" style="left: 540px; top: 100px; width: 20px; height: 420px;"></div>
-                
-                <div class="wall" style="left: 660px; top: 320px; width: 20px; height: 200px;"></div>
-                
-                <div class="wall" style="left: 660px; top: 320px; width: 120px; height: 20px;"></div>
+                <div class="wall" style="left: 600px; top: 120px; width: 20px; height: 400px;"></div>
 
                 <div class="end-zone" id="end-zone">❤️</div>
             </div>
@@ -232,7 +223,7 @@
             <img src="nossa_foto.jpg" alt="A Nossa Foto">
             <div class="polaroid-text">Amo-te muito!</div>
         </div>
-        <p class="sub-text">Parabéns por superares o desafio! És incrível! 🥰</p>
+        <p class="sub-text">Parabéns por superares o labirinto! <br> És muito especial para mim e quero-te para sempre. 🥰</p>
     </div>
 
     <script>
@@ -244,8 +235,8 @@
         const statusText = document.getElementById('status-text');
         
         // Posição inicial do jogador
-        const startX = 20;
-        const startY = 20;
+        const startX = 40;
+        const startY = 40;
         let playerX = startX;
         let playerY = startY;
         const step = 10;
@@ -265,7 +256,7 @@
             playerX = startX;
             playerY = startY;
             updatePlayerPosition();
-            statusText.innerText = "Cuidado com os fantasmas vermelhos!";
+            statusText.innerText = "Cuidado com os fantasminhas!";
             statusText.style.color = "#00d2ff";
         }
 
@@ -281,42 +272,33 @@
                      rect1.top > rect2.bottom);
         }
 
-        // --- SISTEMA DAS ARMADILHAS ---
+        // --- SISTEMA DOS FANTASMAS ---
         function startTraps() {
             if (trapPatrolInterval) clearInterval(trapPatrolInterval);
 
             trapPatrolInterval = setInterval(() => {
                 if (!gameActive) return;
 
-                // Armadilha 1 (Horizontal - Fundo)
+                // Fantasma 1 (Sobe e desce no 2º corredor)
                 let t1 = document.getElementById('trap1');
-                let t1X = parseInt(t1.style.left);
+                let t1Y = parseInt(t1.style.top);
                 let t1Dir = t1.getAttribute('data-direction');
-                if (t1Dir === 'right') t1X += 5; else t1X -= 5;
-                if (t1X > 370) t1.setAttribute('data-direction', 'left');
-                if (t1X < 120) t1.setAttribute('data-direction', 'right');
-                t1.style.left = t1X + 'px';
+                if (t1Dir === 'down') t1Y += 5; else t1Y -= 5;
+                if (t1Y > 400) t1.setAttribute('data-direction', 'up');
+                if (t1Y < 50) t1.setAttribute('data-direction', 'down');
+                t1.style.top = t1Y + 'px';
 
-                // Armadilha 2 (Vertical - Corredor do Meio)
+                // Fantasma 2 (Sobe e desce no 4º corredor)
                 let t2 = document.getElementById('trap2');
                 let t2Y = parseInt(t2.style.top);
                 let t2Dir = t2.getAttribute('data-direction');
                 if (t2Dir === 'down') t2Y += 5; else t2Y -= 5;
-                if (t2Y > 480) t2.setAttribute('data-direction', 'up');
-                if (t2Y < 130) t2.setAttribute('data-direction', 'down');
+                if (t2Y > 400) t2.setAttribute('data-direction', 'up');
+                if (t2Y < 50) t2.setAttribute('data-direction', 'down');
                 t2.style.top = t2Y + 'px';
 
-                // Armadilha 3 (Vertical - Descida final)
-                let t3 = document.getElementById('trap3');
-                let t3Y = parseInt(t3.style.top);
-                let t3Dir = t3.getAttribute('data-direction');
-                if (t3Dir === 'down') t3Y += 5; else t3Y -= 5;
-                if (t3Y > 280) t3.setAttribute('data-direction', 'up');
-                if (t3Y < 20) t3.setAttribute('data-direction', 'down');
-                t3.style.top = t3Y + 'px';
-
                 checkTrapCollisions();
-            }, 50); // Movimento fluído
+            }, 50); 
         }
 
         function checkTrapCollisions() {
@@ -332,7 +314,7 @@
             traps.forEach(trap => {
                 let trapX = parseInt(trap.style.left);
                 let trapY = parseInt(trap.style.top);
-                let trapSize = 20;
+                let trapSize = 30; // tamanho do emoji
 
                 let trapRect = {
                     left: trapX,
@@ -343,7 +325,7 @@
 
                 if (checkCollision(playerRect, trapRect)) {
                     gameActive = false;
-                    statusText.innerText = "Oops! Um fantasma apanhou-te! Volta ao início.";
+                    statusText.innerText = "Bolas! Um fantasma apanhou-te! Volta ao início.";
                     statusText.style.color = "#ff1744";
                     setTimeout(() => {
                         resetPlayer();
@@ -370,7 +352,7 @@
             if (e.code === 'ArrowLeft') newX -= step;
             if (e.code === 'ArrowRight') newX += step;
 
-            // Limites da caixa
+            // Limites da caixa do labirinto
             if (newX < 0 || newY < 0 || newX > 760 || newY > 500) return; 
 
             let tempRect = {
@@ -423,7 +405,7 @@
             playerX = newX;
             playerY = newY;
             updatePlayerPosition();
-            statusText.innerText = "Consegues! Continua...";
+            statusText.innerText = "Isso mesmo! Continua...";
             statusText.style.color = "#00acc1";
         });
     </script>
