@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uma Surpresa para Ti ❤️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&family=Pacifico&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #ffe6e6;
+            color: #d81b60;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .screen {
+            display: none;
+            text-align: center;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+        }
+
+        .active {
+            display: flex;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        h1 {
+            font-family: 'Pacifico', cursive;
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: #c2185b;
+        }
+
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            max-width: 600px;
+        }
+
+        .btn {
+            background-color: #d81b60;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+            box-shadow: 0 4px 15px rgba(216, 27, 96, 0.3);
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            background-color: #c2185b;
+        }
+
+        /* Labirinto */
+        #maze-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #status-text {
+            height: 30px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #e91e63;
+        }
+
+        #maze-container {
+            width: 600px;
+            height: 400px;
+            background-color: #fff0f5;
+            position: relative;
+            border: 4px solid #c2185b;
+            border-radius: 10px;
+            cursor: crosshair;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .wall {
+            background-color: #ff4d4d;
+            position: absolute;
+            background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.2) 10px, rgba(255,255,255,0.2) 20px);
+        }
+
+        .start-zone, .end-zone {
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: white;
+            border-radius: 5px;
+        }
+
+        .start-zone {
+            background-color: #4CAF50;
+            left: 10px;
+            top: 10px;
+            width: 80px;
+            height: 80px;
+        }
+
+        .end-zone {
+            background-color: #d81b60;
+            right: 10px;
+            bottom: 10px;
+            width: 80px;
+            height: 80px;
+            font-size: 2rem;
+        }
+
+        /* Foto Surpresa */
+        .polaroid {
+            background: white;
+            padding: 20px 20px 40px 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            border-radius: 5px;
+            transform: rotate(-3deg);
+            transition: transform 0.3s;
+            max-width: 90%;
+        }
+
+        .polaroid:hover {
+            transform: rotate(0deg) scale(1.02);
+        }
+
+        .polaroid img {
+            width: 400px;
+            height: 400px;
+            object-fit: cover; /* Mantém a foto direita mesmo que não seja quadrada */
+            border: 1px solid #eee;
+        }
+
+        .polaroid-text {
+            font-family: 'Pacifico', cursive;
+            font-size: 2.5rem;
+            color: #d81b60;
+            margin-top: 15px;
+        }
+
+        .sub-text {
+            font-size: 1.2rem;
+            color: #555;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- TELA 1: INÍCIO -->
+    <div id="screen1" class="screen active">
+        <h1>Olá, meu amor! ❤️</h1>
+        <p>Tenho uma surpresa muito especial para ti, mas como tu sabes, as melhores coisas da vida exigem um bocadinho de esforço...</p>
+        <p><strong>Regras:</strong> Usa o rato do teu computador. Clica no botão abaixo e, no ecrã seguinte, vais ter de guiar o rato desde o quadro verde (Início) até ao Coração.</p>
+        <p>⚠️ <em>Se tocares nas paredes vermelhas ou saíres da caixa, tens de voltar ao início!</em></p>
+        <button class="btn" onclick="goToMaze()">Aceitar o Desafio</button>
+    </div>
+
+    <!-- TELA 2: O LABIRINTO -->
+    <div id="screen2" class="screen">
+        <div id="maze-wrapper">
+            <h2>Prova a tua paciência por mim! 😂</h2>
+            <p id="status-text">Passa o rato no quadro Verde para começar.</p>
+            
+            <div id="maze-container">
+                <!-- Zona de Início -->
+                <div class="start-zone" id="start-zone">Início</div>
+                
+                <!-- Paredes (O obstáculo) -->
+                <!-- Parede 1 (Obriga a ir para baixo) -->
+                <div class="wall" style="left: 100px; top: 0; width: 30px; height: 320px;"></div>
+                <!-- Parede 2 (Obriga a ir para cima) -->
+                <div class="wall" style="left: 230px; top: 80px; width: 30px; height: 320px;"></div>
+                <!-- Parede 3 (Obriga a ir para baixo) -->
+                <div class="wall" style="left: 360px; top: 0; width: 30px; height: 320px;"></div>
+                <!-- Parede 4 (Obriga a ir para cima) -->
+                <div class="wall" style="left: 490px; top: 80px; width: 30px; height: 320px;"></div>
+
+                <!-- Zona de Fim -->
+                <div class="end-zone" id="end-zone">❤️</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TELA 3: A SURPRESA -->
+    <div id="screen3" class="screen">
+        <div class="polaroid">
+            <!-- COLOCA AQUI O NOME DA VOSSA FOTO (ex: foto.jpg) -->
+            <img src="nossa_foto.jpg" alt="A Nossa Foto">
+            <div class="polaroid-text">Amo-te muito!</div>
+        </div>
+        <p class="sub-text">És a melhor coisa que me aconteceu. Parabéns por chegares até aqui! 🥰</p>
+    </div>
+
+    <script>
+        // Variáveis de controlo do jogo
+        let gameActive = false;
+        let hasTouchedWall = false;
+
+        const screen1 = document.getElementById('screen1');
+        const screen2 = document.getElementById('screen2');
+        const screen3 = document.getElementById('screen3');
+        const statusText = document.getElementById('status-text');
+        const mazeContainer = document.getElementById('maze-container');
+        const startZone = document.getElementById('start-zone');
+        const endZone = document.getElementById('end-zone');
+        const walls = document.querySelectorAll('.wall');
+
+        // Mudar para o ecrã do labirinto
+        function goToMaze() {
+            screen1.classList.remove('active');
+            screen2.classList.add('active');
+        }
+
+        // Começar o labirinto (quando o rato entra no "Início")
+        startZone.addEventListener('mouseenter', () => {
+            gameActive = true;
+            hasTouchedWall = false;
+            statusText.innerText = "Cuidado! Vai devagarinho...";
+            statusText.style.color = "#4CAF50";
+        });
+
+        // Função para quando ela perde
+        function loseGame() {
+            if (!gameActive) return;
+            gameActive = false;
+            hasTouchedWall = true;
+            statusText.innerText = "Oops! Tocaste no vermelho. Volta ao 'Início'.";
+            statusText.style.color = "#ff4d4d";
+        }
+
+        // Aplicar o "game over" a todas as paredes
+        walls.forEach(wall => {
+            wall.addEventListener('mouseenter', loseGame);
+        });
+
+        // Sistema anti-batota: se ela tirar o rato de dentro do labirinto, perde!
+        mazeContainer.addEventListener('mouseleave', () => {
+            if (gameActive) {
+                loseGame();
+                statusText.innerText = "Batoteira! Não podes sair fora do quadro. Volta ao 'Início'.";
+            }
+        });
+
+        // Ganhar o jogo e revelar a foto!
+        endZone.addEventListener('mouseenter', () => {
+            if (gameActive && !hasTouchedWall) {
+                gameActive = false;
+                // Mudar para o ecrã da foto
+                screen2.classList.remove('active');
+                screen3.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>
