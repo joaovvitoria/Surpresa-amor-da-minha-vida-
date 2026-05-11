@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Uma Surpresa para Ti ❤️</title>
+    <title>Uma Surpresa Especial para Ti ❤️</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&family=Pacifico&display=swap" rel="stylesheet">
     <style>
         * {
@@ -70,7 +70,7 @@
             background-color: #c2185b;
         }
 
-        /* Labirinto */
+        /* Labirinto Expandido */
         #maze-wrapper {
             display: flex;
             flex-direction: column;
@@ -85,33 +85,44 @@
         }
 
         #maze-container {
-            width: 600px;
-            height: 400px;
-            background-color: #fff0f5;
+            width: 780px; /* Maior */
+            height: 520px; /* Maior */
+            background-color: #e0f7fa; /* Fundo diferente */
             position: relative;
-            border: 4px solid #c2185b;
-            border-radius: 10px;
+            border: 5px solid #00acc1;
+            border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             overflow: hidden;
         }
 
-        /* O Jogador */
+        /* O Jogador (Ajustado) */
         #player {
             position: absolute;
-            width: 30px;
-            height: 30px;
-            background-color: #2196F3;
-            border-radius: 5px;
-            top: 20px;
-            left: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            width: 20px; /* Um pouco menor para corredores estreitos */
+            height: 20px;
+            background-color: #00d2ff;
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(0,210,255,0.8);
             z-index: 10;
         }
 
         .wall {
             background-color: #ff4d4d;
             position: absolute;
-            background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.2) 10px, rgba(255,255,255,0.2) 20px);
+            background-image: repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(255,255,255,0.1) 8px, rgba(255,255,255,0.1) 16px);
+            border-radius: 2px;
+        }
+
+        /* Armadilhas em Movimento (Novas) */
+        .moving-trap {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: #ff1744;
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(255,23,68,0.9);
+            z-index: 5;
+            transition: left 0.1s linear, top 0.1s linear; /* Suavizar movimento */
         }
 
         .end-zone {
@@ -120,17 +131,17 @@
             justify-content: center;
             align-items: center;
             background-color: #d81b60;
-            right: 10px;
-            bottom: 10px;
-            width: 70px;
-            height: 70px;
-            font-size: 2rem;
+            right: 15px;
+            bottom: 15px;
+            width: 60px;
+            height: 60px;
+            font-size: 1.8rem;
             border-radius: 10px;
             color: white;
             box-shadow: 0 4px 10px rgba(216, 27, 96, 0.4);
         }
 
-        /* Foto Surpresa */
+        /* Foto Surpresa (Mesma lógica) */
         .polaroid {
             background: white;
             padding: 20px 20px 40px 20px;
@@ -175,30 +186,57 @@
 </head>
 <body>
 
-    <!-- TELA 1: INÍCIO -->
+    <!-- TELA 1: INÍCIO (Atualizada) -->
     <div id="screen1" class="screen active">
         <h1>Olá, meu amor! ❤️</h1>
-        <p>Tenho uma surpresa muito especial para ti, mas como tu sabes, as melhores coisas da vida exigem um bocadinho de esforço...</p>
-        <p><strong>Regras do Jogo:</strong> Usa as <strong>SETAS DO TECLADO</strong> (Cima, Baixo, Esquerda, Direita) para mover o teu bloquinho azul até ao Coração.</p>
-        <p>⚠️ <em>Se bateres nas paredes vermelhas, voltas ao início!</em></p>
-        <button class="btn" onclick="startGame()">Aceitar o Desafio</button>
+        <p>A tua primeira surpresa foi muito fácil, por isso preparei um desafio maior e mais complexo!</p>
+        <p><strong>Regras do Jogo:</strong> Usa as <strong>SETAS DO TECLADO</strong> (Cima, Baixo, Esquerda, Direita) para mover o teu bloquinho ciano até ao Coração.</p>
+        <p>⚠️ <em>Cuidado com as paredes vermelhas E com os perigos em movimento! Se bateres, recomeças!</em></p>
+        <button class="btn" onclick="startGame()">Aceitar o Desafio Maior</button>
     </div>
 
-    <!-- TELA 2: O LABIRINTO -->
+    <!-- TELA 2: O LABIRINTO (Atualizada) -->
     <div id="screen2" class="screen">
         <div id="maze-wrapper">
-            <h2>Prova a tua paciência por mim! 😂</h2>
+            <h2>Labirinto do Amor... Nível 2! 😂</h2>
             <p id="status-text">Usa as setas do teclado para te moveres.</p>
             
             <div id="maze-container">
-                <!-- O nosso Jogador (Bloquinho azul) -->
+                <!-- O nosso Jogador -->
                 <div id="player"></div>
                 
-                <!-- Paredes do Labirinto -->
-                <div class="wall" style="left: 100px; top: 0; width: 30px; height: 320px;"></div>
-                <div class="wall" style="left: 230px; top: 80px; width: 30px; height: 320px;"></div>
-                <div class="wall" style="left: 360px; top: 0; width: 30px; height: 320px;"></div>
-                <div class="wall" style="left: 490px; top: 80px; width: 30px; height: 320px;"></div>
+                <!-- Armadilhas em Movimento (Novas) -->
+                <div class="moving-trap" id="trap1" style="left: 200px; top: 150px;"></div>
+                <div class="moving-trap" id="trap2" style="left: 600px; top: 350px;"></div>
+                
+                <!-- Paredes do Labirinto (MUITO MAIS!) -->
+                <!-- Caminho inicial para baixo -->
+                <div class="wall" style="left: 60px; top: 0; width: 20px; height: 180px;"></div>
+                <div class="wall" style="left: 0; top: 180px; width: 80px; height: 20px;"></div>
+
+                <!-- Grande barreira central vertical -->
+                <div class="wall" style="left: 140px; top: 0; width: 20px; height: 440px;"></div>
+                
+                <!-- Caminho horizontal superior -->
+                <div class="wall" style="left: 140px; top: 80px; width: 500px; height: 20px;"></div>
+                
+                <!-- Bloqueios centrais -->
+                <div class="wall" style="left: 220px; top: 160px; width: 440px; height: 20px;"></div>
+                <div class="wall" style="left: 220px; top: 160px; width: 20px; height: 300px;"></div>
+                <div class="wall" style="left: 220px; top: 440px; width: 440px; height: 20px;"></div>
+                
+                <!-- Barreira vertical final -->
+                <div class="wall" style="left: 640px; top: 160px; width: 20px; height: 240px;"></div>
+
+                <!-- Pequenos bloqueios de corredor -->
+                <div class="wall" style="left: 300px; top: 240px; width: 20px; height: 140px;"></div>
+                <div class="wall" style="left: 300px; top: 240px; width: 200px; height: 20px;"></div>
+                <div class="wall" style="left: 480px; top: 240px; width: 20px; height: 140px;"></div>
+                <div class="wall" style="left: 300px; top: 360px; width: 140px; height: 20px;"></div>
+                
+                <!-- Bloqueio perto do fim -->
+                <div class="wall" style="left: 560px; top: 300px; width: 20px; height: 140px;"></div>
+                <div class="wall" style="left: 700px; top: 400px; width: 80px; height: 20px;"></div>
 
                 <!-- Zona de Fim (Coração) -->
                 <div class="end-zone" id="end-zone">❤️</div>
@@ -206,14 +244,13 @@
         </div>
     </div>
 
-    <!-- TELA 3: A SURPRESA -->
+    <!-- TELA 3: A SURPRESA (Mesma) -->
     <div id="screen3" class="screen">
         <div class="polaroid">
-            <!-- LEMBRA-TE DE COLOCAR A VOSSA FOTO AQUI COM ESTE NOME exato -->
             <img src="nossa_foto.jpg" alt="A Nossa Foto">
             <div class="polaroid-text">Amo-te muito!</div>
         </div>
-        <p class="sub-text">És a melhor coisa que me aconteceu. Parabéns por chegares até aqui! 🥰</p>
+        <p class="sub-text">Parabéns por superares o desafio maior! 🥰</p>
     </div>
 
     <script>
@@ -221,26 +258,34 @@
         const player = document.getElementById('player');
         const endZone = document.getElementById('end-zone');
         const walls = document.querySelectorAll('.wall');
+        const traps = document.querySelectorAll('.moving-trap');
         const statusText = document.getElementById('status-text');
         
-        // Posição inicial do jogador
+        // Posição inicial do jogador (Ajustada)
         const startX = 20;
         const startY = 20;
         let playerX = startX;
         let playerY = startY;
-        const step = 15; // Velocidade do bloco
+        const step = 10; // Velocidade ajustada
+        const playerSize = 20;
+        
+        // Configurações das armadilhas
+        let trapPatrolInterval;
 
         function startGame() {
             document.getElementById('screen1').classList.remove('active');
             document.getElementById('screen2').classList.add('active');
             gameActive = true;
             resetPlayer();
+            startTraps(); // Iniciar movimento das armadilhas
         }
 
         function resetPlayer() {
             playerX = startX;
             playerY = startY;
             updatePlayerPosition();
+            statusText.innerText = "Cuidado com os fantasmas vermelhos!";
+            statusText.style.color = "#00d2ff";
         }
 
         function updatePlayerPosition() {
@@ -248,7 +293,7 @@
             player.style.top = playerY + 'px';
         }
 
-        // Função que verifica se duas "caixas" (elementos) estão a bater uma na outra
+        // Função de colisão (Melhorada)
         function checkCollision(rect1, rect2) {
             return !(rect1.right < rect2.left || 
                      rect1.left > rect2.right || 
@@ -256,11 +301,89 @@
                      rect1.top > rect2.bottom);
         }
 
+        // --- SISTEMA DE MOVIMENTO DAS ARMADILHAS (Novo) ---
+        function startTraps() {
+            // Se já houver um intervalo, limpá-lo
+            if (trapPatrolInterval) clearInterval(trapPatrolInterval);
+
+            // Iniciar o intervalo de movimento (a cada 100ms)
+            trapPatrolInterval = setInterval(() => {
+                if (!gameActive) return;
+
+                // Armadilha 1: Patrulha horizontal
+                let t1 = document.getElementById('trap1');
+                let t1X = parseInt(t1.style.left);
+                let t1Direction = t1.getAttribute('data-direction') || 'right';
+
+                if (t1Direction === 'right') t1X += 5;
+                else t1X -= 5;
+
+                // Limites de patrulha para Trap 1
+                if (t1X > 740) t1.setAttribute('data-direction', 'left');
+                if (t1X < 180) t1.setAttribute('data-direction', 'right');
+                t1.style.left = t1X + 'px';
+
+                // Armadilha 2: Patrulha vertical
+                let t2 = document.getElementById('trap2');
+                let t2Y = parseInt(t2.style.top);
+                let t2Direction = t2.getAttribute('data-direction') || 'down';
+
+                if (t2Direction === 'down') t2Y += 5;
+                else t2Y -= 5;
+
+                // Limites de patrulha para Trap 2
+                if (t2Y > 480) t2.setAttribute('data-direction', 'up');
+                if (t2Y < 200) t2.setAttribute('data-direction', 'down');
+                t2.style.top = t2Y + 'px';
+
+                // Verificar colisão do jogador com as armadilhas
+                checkTrapCollisions();
+
+            }, 100);
+        }
+
+        function checkTrapCollisions() {
+            if (!gameActive) return;
+
+            let playerRect = {
+                left: playerX,
+                right: playerX + playerSize,
+                top: playerY,
+                bottom: playerY + playerSize
+            };
+
+            traps.forEach(trap => {
+                let trapX = parseInt(trap.style.left);
+                let trapY = parseInt(trap.style.top);
+                let trapSize = 20; // Tamanho definido no CSS
+
+                let trapRect = {
+                    left: trapX,
+                    right: trapX + trapSize,
+                    top: trapY,
+                    bottom: trapY + trapSize
+                };
+
+                if (checkCollision(playerRect, trapRect)) {
+                    // Colisão detetada!
+                    gameActive = false; // Parar o jogo temporariamente
+                    statusText.innerText = "Oops! Um fantasma apanhou-te! Volta ao início.";
+                    statusText.style.color = "#ff1744";
+                    
+                    // Dar um pequeno tempo antes de recomeçar
+                    setTimeout(() => {
+                        resetPlayer();
+                        gameActive = true;
+                    }, 500);
+                }
+            });
+        }
+        // ---------------------------------------------------
+
         // Movimento através das setas do teclado
         document.addEventListener('keydown', (e) => {
             if (!gameActive) return;
 
-            // Bloquear que as setas façam scroll na página
             if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.code)) {
                 e.preventDefault();
             }
@@ -273,17 +396,16 @@
             if (e.code === 'ArrowLeft') newX -= step;
             if (e.code === 'ArrowRight') newX += step;
 
-            // Impedir que o jogador saia da caixa principal
-            if (newX < 0 || newY < 0 || newX > 570 || newY > 370) {
+            // Impedir saída da caixa principal (Ajustada para o novo tamanho)
+            if (newX < 0 || newY < 0 || newX > 760 || newY > 500) {
                 return; 
             }
 
-            // Simulamos o movimento para ver se vai bater numa parede
             let tempRect = {
                 left: newX,
-                right: newX + 30, // 30 é a largura do bloco
+                right: newX + playerSize,
                 top: newY,
-                bottom: newY + 30 // 30 é a altura do bloco
+                bottom: newY + playerSize
             };
 
             let hitWall = false;
@@ -293,7 +415,6 @@
                 let wallRect = wall.getBoundingClientRect();
                 let containerRect = document.getElementById('maze-container').getBoundingClientRect();
                 
-                // Ajustar a posição da parede para dentro do quadro
                 let relativeWallRect = {
                     left: wallRect.left - containerRect.left,
                     right: wallRect.right - containerRect.left,
@@ -307,7 +428,7 @@
             });
 
             if (hitWall) {
-                statusText.innerText = "Oops! Bateste na parede vermelha. Tenta de novo!";
+                statusText.innerText = "Oops! Bater nas paredes dói! Tenta de novo!";
                 statusText.style.color = "#ff4d4d";
                 resetPlayer();
                 return;
@@ -325,6 +446,7 @@
 
             if (checkCollision(tempRect, relativeEndRect)) {
                 gameActive = false;
+                if (trapPatrolInterval) clearInterval(trapPatrolInterval); // Parar armadilhas
                 document.getElementById('screen2').classList.remove('active');
                 document.getElementById('screen3').classList.add('active');
                 return;
@@ -334,8 +456,8 @@
             playerX = newX;
             playerY = newY;
             updatePlayerPosition();
-            statusText.innerText = "Muito bem, continua...";
-            statusText.style.color = "#e91e63";
+            statusText.innerText = "Consegues! Continua...";
+            statusText.style.color = "#00acc1";
         });
     </script>
 </body>
