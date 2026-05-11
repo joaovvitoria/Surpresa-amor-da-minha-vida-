@@ -91,8 +91,21 @@
             position: relative;
             border: 4px solid #c2185b;
             border-radius: 10px;
-            cursor: crosshair;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        /* O Jogador */
+        #player {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: #2196F3;
+            border-radius: 5px;
+            top: 20px;
+            left: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            z-index: 10;
         }
 
         .wall {
@@ -101,31 +114,20 @@
             background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.2) 10px, rgba(255,255,255,0.2) 20px);
         }
 
-        .start-zone, .end-zone {
+        .end-zone {
             position: absolute;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-weight: bold;
-            color: white;
-            border-radius: 5px;
-        }
-
-        .start-zone {
-            background-color: #4CAF50;
-            left: 10px;
-            top: 10px;
-            width: 80px;
-            height: 80px;
-        }
-
-        .end-zone {
             background-color: #d81b60;
             right: 10px;
             bottom: 10px;
-            width: 80px;
-            height: 80px;
+            width: 70px;
+            height: 70px;
             font-size: 2rem;
+            border-radius: 10px;
+            color: white;
+            box-shadow: 0 4px 10px rgba(216, 27, 96, 0.4);
         }
 
         /* Foto Surpresa */
@@ -146,7 +148,7 @@
         .polaroid img {
             width: 400px;
             height: 400px;
-            object-fit: cover; /* Mantém a foto direita mesmo que não seja quadrada */
+            object-fit: cover;
             border: 1px solid #eee;
         }
 
@@ -177,32 +179,28 @@
     <div id="screen1" class="screen active">
         <h1>Olá, meu amor! ❤️</h1>
         <p>Tenho uma surpresa muito especial para ti, mas como tu sabes, as melhores coisas da vida exigem um bocadinho de esforço...</p>
-        <p><strong>Regras:</strong> Usa o rato do teu computador. Clica no botão abaixo e, no ecrã seguinte, vais ter de guiar o rato desde o quadro verde (Início) até ao Coração.</p>
-        <p>⚠️ <em>Se tocares nas paredes vermelhas ou saíres da caixa, tens de voltar ao início!</em></p>
-        <button class="btn" onclick="goToMaze()">Aceitar o Desafio</button>
+        <p><strong>Regras do Jogo:</strong> Usa as <strong>SETAS DO TECLADO</strong> (Cima, Baixo, Esquerda, Direita) para mover o teu bloquinho azul até ao Coração.</p>
+        <p>⚠️ <em>Se bateres nas paredes vermelhas, voltas ao início!</em></p>
+        <button class="btn" onclick="startGame()">Aceitar o Desafio</button>
     </div>
 
     <!-- TELA 2: O LABIRINTO -->
     <div id="screen2" class="screen">
         <div id="maze-wrapper">
             <h2>Prova a tua paciência por mim! 😂</h2>
-            <p id="status-text">Passa o rato no quadro Verde para começar.</p>
+            <p id="status-text">Usa as setas do teclado para te moveres.</p>
             
             <div id="maze-container">
-                <!-- Zona de Início -->
-                <div class="start-zone" id="start-zone">Início</div>
+                <!-- O nosso Jogador (Bloquinho azul) -->
+                <div id="player"></div>
                 
-                <!-- Paredes (O obstáculo) -->
-                <!-- Parede 1 (Obriga a ir para baixo) -->
+                <!-- Paredes do Labirinto -->
                 <div class="wall" style="left: 100px; top: 0; width: 30px; height: 320px;"></div>
-                <!-- Parede 2 (Obriga a ir para cima) -->
                 <div class="wall" style="left: 230px; top: 80px; width: 30px; height: 320px;"></div>
-                <!-- Parede 3 (Obriga a ir para baixo) -->
                 <div class="wall" style="left: 360px; top: 0; width: 30px; height: 320px;"></div>
-                <!-- Parede 4 (Obriga a ir para cima) -->
                 <div class="wall" style="left: 490px; top: 80px; width: 30px; height: 320px;"></div>
 
-                <!-- Zona de Fim -->
+                <!-- Zona de Fim (Coração) -->
                 <div class="end-zone" id="end-zone">❤️</div>
             </div>
         </div>
@@ -211,7 +209,7 @@
     <!-- TELA 3: A SURPRESA -->
     <div id="screen3" class="screen">
         <div class="polaroid">
-            <!-- COLOCA AQUI O NOME DA VOSSA FOTO (ex: foto.jpg) -->
+            <!-- LEMBRA-TE DE COLOCAR A VOSSA FOTO AQUI COM ESTE NOME exato -->
             <img src="nossa_foto.jpg" alt="A Nossa Foto">
             <div class="polaroid-text">Amo-te muito!</div>
         </div>
@@ -219,63 +217,125 @@
     </div>
 
     <script>
-        // Variáveis de controlo do jogo
         let gameActive = false;
-        let hasTouchedWall = false;
-
-        const screen1 = document.getElementById('screen1');
-        const screen2 = document.getElementById('screen2');
-        const screen3 = document.getElementById('screen3');
-        const statusText = document.getElementById('status-text');
-        const mazeContainer = document.getElementById('maze-container');
-        const startZone = document.getElementById('start-zone');
+        const player = document.getElementById('player');
         const endZone = document.getElementById('end-zone');
         const walls = document.querySelectorAll('.wall');
+        const statusText = document.getElementById('status-text');
+        
+        // Posição inicial do jogador
+        const startX = 20;
+        const startY = 20;
+        let playerX = startX;
+        let playerY = startY;
+        const step = 15; // Velocidade do bloco
 
-        // Mudar para o ecrã do labirinto
-        function goToMaze() {
-            screen1.classList.remove('active');
-            screen2.classList.add('active');
-        }
-
-        // Começar o labirinto (quando o rato entra no "Início")
-        startZone.addEventListener('mouseenter', () => {
+        function startGame() {
+            document.getElementById('screen1').classList.remove('active');
+            document.getElementById('screen2').classList.add('active');
             gameActive = true;
-            hasTouchedWall = false;
-            statusText.innerText = "Cuidado! Vai devagarinho...";
-            statusText.style.color = "#4CAF50";
-        });
-
-        // Função para quando ela perde
-        function loseGame() {
-            if (!gameActive) return;
-            gameActive = false;
-            hasTouchedWall = true;
-            statusText.innerText = "Oops! Tocaste no vermelho. Volta ao 'Início'.";
-            statusText.style.color = "#ff4d4d";
+            resetPlayer();
         }
 
-        // Aplicar o "game over" a todas as paredes
-        walls.forEach(wall => {
-            wall.addEventListener('mouseenter', loseGame);
-        });
+        function resetPlayer() {
+            playerX = startX;
+            playerY = startY;
+            updatePlayerPosition();
+        }
 
-        // Sistema anti-batota: se ela tirar o rato de dentro do labirinto, perde!
-        mazeContainer.addEventListener('mouseleave', () => {
-            if (gameActive) {
-                loseGame();
-                statusText.innerText = "Batoteira! Não podes sair fora do quadro. Volta ao 'Início'.";
+        function updatePlayerPosition() {
+            player.style.left = playerX + 'px';
+            player.style.top = playerY + 'px';
+        }
+
+        // Função que verifica se duas "caixas" (elementos) estão a bater uma na outra
+        function checkCollision(rect1, rect2) {
+            return !(rect1.right < rect2.left || 
+                     rect1.left > rect2.right || 
+                     rect1.bottom < rect2.top || 
+                     rect1.top > rect2.bottom);
+        }
+
+        // Movimento através das setas do teclado
+        document.addEventListener('keydown', (e) => {
+            if (!gameActive) return;
+
+            // Bloquear que as setas façam scroll na página
+            if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.code)) {
+                e.preventDefault();
             }
-        });
 
-        // Ganhar o jogo e revelar a foto!
-        endZone.addEventListener('mouseenter', () => {
-            if (gameActive && !hasTouchedWall) {
+            let newX = playerX;
+            let newY = playerY;
+
+            if (e.code === 'ArrowUp') newY -= step;
+            if (e.code === 'ArrowDown') newY += step;
+            if (e.code === 'ArrowLeft') newX -= step;
+            if (e.code === 'ArrowRight') newX += step;
+
+            // Impedir que o jogador saia da caixa principal
+            if (newX < 0 || newY < 0 || newX > 570 || newY > 370) {
+                return; 
+            }
+
+            // Simulamos o movimento para ver se vai bater numa parede
+            let tempRect = {
+                left: newX,
+                right: newX + 30, // 30 é a largura do bloco
+                top: newY,
+                bottom: newY + 30 // 30 é a altura do bloco
+            };
+
+            let hitWall = false;
+            
+            // Verificar colisão com as paredes
+            walls.forEach(wall => {
+                let wallRect = wall.getBoundingClientRect();
+                let containerRect = document.getElementById('maze-container').getBoundingClientRect();
+                
+                // Ajustar a posição da parede para dentro do quadro
+                let relativeWallRect = {
+                    left: wallRect.left - containerRect.left,
+                    right: wallRect.right - containerRect.left,
+                    top: wallRect.top - containerRect.top,
+                    bottom: wallRect.bottom - containerRect.top
+                };
+
+                if (checkCollision(tempRect, relativeWallRect)) {
+                    hitWall = true;
+                }
+            });
+
+            if (hitWall) {
+                statusText.innerText = "Oops! Bateste na parede vermelha. Tenta de novo!";
+                statusText.style.color = "#ff4d4d";
+                resetPlayer();
+                return;
+            }
+
+            // Verificar se chegou ao coração
+            let endRect = endZone.getBoundingClientRect();
+            let containerRect = document.getElementById('maze-container').getBoundingClientRect();
+            let relativeEndRect = {
+                left: endRect.left - containerRect.left,
+                right: endRect.right - containerRect.left,
+                top: endRect.top - containerRect.top,
+                bottom: endRect.bottom - containerRect.top
+            };
+
+            if (checkCollision(tempRect, relativeEndRect)) {
                 gameActive = false;
-                // Mudar para o ecrã da foto
-                screen2.classList.remove('active');
-                screen3.classList.add('active');
+                document.getElementById('screen2').classList.remove('active');
+                document.getElementById('screen3').classList.add('active');
+                return;
             }
+
+            // Se não bateu em nada e não ganhou, move o bloco!
+            playerX = newX;
+            playerY = newY;
+            updatePlayerPosition();
+            statusText.innerText = "Muito bem, continua...";
+            statusText.style.color = "#e91e63";
         });
     </script>
 </body>
